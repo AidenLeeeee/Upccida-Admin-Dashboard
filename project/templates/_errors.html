@@ -1,0 +1,5 @@
+<div class="error-message">
+    {% for message in get_flashed_messages() %}
+        <i class="fa-solid fa-exclamation exclamation"></i> {{ message }}
+    {% endfor %}
+</div>

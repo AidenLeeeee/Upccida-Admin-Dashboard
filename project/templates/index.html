@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+{% block head %}
+<!-- CSS INIT -->
+<link rel="stylesheet" href="../static/css/events.css">
+{% endblock %}
+
+{% block content %}
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-logo" href="{{ url_for('base.index') }}">
+            <img class="logo" src="../static/images/favicons.ico/favicon-96x96.png" alt="Logo" height="35" width="35">
+        </a>
+        <a class="navbar-brand" href="{{ url_for('base.index') }}">SOLOv6</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{{ url_for('base.index') }}">HOME</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('base.index') }}">Events</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('cars.cars') }}">Cars</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('users.users') }}">Users</a>
+                </li>
+            </ul>
+            <div class="profile">
+                {% if g.admin %}
+                <div class="profile-user ms-2">
+                    <i class="fa-solid fa-user-check user-check me-2"></i>
+                    <p>{{ g.admin.admin_name }}</p>
+                </div>
+                <div class="profile-log">
+                    <a href="{{ url_for('auth.logout') }}" class="logout-btn">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </a>
+                </div>
+                {% else %}
+                <div class="profile-user ms-2">
+                    <i class="fa-solid fa-user-xmark user-not-check me-2"></i>
+                    <p>Login</p>
+                </div>
+                <div class="profile-log">
+                    <a href="{{ url_for('auth.login') }}" class="login-btn">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Main -->
+<div class="main">
+    <!-- Main_Calendar -->
+    <div class="calendar-box">
+        <div class="calendar-col">
+            <form class="row calendar-form" action="{{ url_for('base.index') }}" method="get">
+                <div class="col calendar-input-box">
+                    <label for="startDate" id="input_from" class="calendar-input-label">From</label>
+                    <input id="startDate" class="form-control calendar-input" type="date" name="input_from" value="{{ input_from or '' }}"/>
+                    <div id="calendar-input-bar"></div>
+                    <label for="endDate" id="input_to" class="calendar-input-label">To</label>
+                    <input id="endDate" class="form-control calendar-input" type="date" name="input_to" value="{{ input_to or '' }}"/>
+                    <div id="calendar-input-bar"></div>
+                    <input id="needle search-needle" class="form-control calendar-input" type="text" name="needle" value="{{ needle or '' }}" placeholder="Car ID..." aria-label="Search" autocomplete="off">
+                    <input id="page" type="hidden" name="page" value=1>
+                </div>
+                <div class="col calendar-btn-box">
+                    <button id="calendar-btn" type="submit" class="btn btn-primary mb-3 calendar-btn">
+                        <i class="fa-solid fa-magnifying-glass fa-sm"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main_List -->
+    <div class="container list-box">
+        <div class="row list-title-box border-bottom">
+            <div class="col-3 list-title my-3 me-5">
+                Event ID
+            </div>
+            <div class="col-3 list-title my-3 me-5">
+                Created On
+            </div>
+            <div class="col-2 list-title my-3 ms-4">
+                User ID
+            </div>
+            <div class="col list-title my-3">
+                Car ID
+            </div>
+        </div>
+        {% if event_list %}
+            {% for event in event_list.items %}
+            {% if ((event.is_damaged_1 == False) and 
+                (event.is_damaged_2 == False) and 
+                (event.is_damaged_3 == False) and
+                (event.is_damaged_4 == False) and
+                (event.is_damaged_5 == False) and
+                (event.is_damaged_6 == False)): %}
+            <div class="card my-2">
+                <div class="card-body">
+                    <div class="row card-body-row">
+                        <div class="col-3 list-col me-2">
+                            {{ event.id }}
+                        </div>
+                        <div class="col-4 list-col">
+                            {{ event.created_on }}
+                        </div>
+                        <div class="col list-col me-5">
+                            {{ event.user_id }}
+                        </div>
+                        <div class="col list-col ms-4">
+                            {{ event.car_id }}
+                        </div>
+                        <div class="col detail-box">
+                            <form class="detail-form" action="{{ url_for('base.detail', id=event.id) }}" method="get">
+                                <button type="submit" class="btn btn-secondary mb-3 detail-btn">
+                                    <i class="fa-solid fa-info"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% elif ((event.is_damaged_1 == True) or 
+                (event.is_damaged_2 == True) or 
+                (event.is_damaged_3 == True) or
+                (event.is_damaged_4 == True) or
+                (event.is_damaged_5 == True) or
+                (event.is_damaged_6 == True)): %}
+            {% if event.conf_score %}
+            {% if event.conf_score > 0.7 %}
+            <div class="card my-2">
+                <div class="card-body background-red">
+                    <div class="row card-body-row">
+                        <div class="col-3 list-col me-2">
+                            {{ event.id }}
+                        </div>
+                        <div class="col-4 list-col">
+                            {{ event.created_on }}
+                        </div>
+                        <div class="col list-col me-5">
+                            {{ event.user_id }}
+                        </div>
+                        <div class="col list-col ms-4">
+                            {{ event.car_id }}
+                        </div>
+                        <div class="col detail-box">
+                            <form class="detail-form" action="{{ url_for('base.detail', id=event.id) }}" method="get">
+                                <button type="submit" class="btn btn-secondary mb-3 detail-btn">
+                                    <i class="fa-solid fa-info"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="card my-2">
+                <div class="card-body background-warning">
+                    <div class="row card-body-row">
+                        <div class="col-3 list-col me-2">
+                            {{ event.id }}
+                        </div>
+                        <div class="col-4 list-col">
+                            {{ event.created_on }}
+                        </div>
+                        <div class="col list-col me-5">
+                            {{ event.user_id }}
+                        </div>
+                        <div class="col list-col ms-4">
+                            {{ event.car_id }}
+                        </div>
+                        <div class="col detail-box">
+                            <form class="detail-form" action="{{ url_for('base.detail', id=event.id) }}" method="get">
+                                <button type="submit" class="btn btn-secondary mb-3 detail-btn">
+                                    <i class="fa-solid fa-info"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+        {% else %}
+        <div class="row">
+            <div class="col-12">
+                <h2>❌ No Event Created ❌</h2>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Pagination -->
+<ul class="pagination my-4 justify-content-center">
+    {% if event_list.has_prev %}
+    <li class="page-item">
+        <a class="page-link" href="?input_from={{ request.args.get('input_from') or '' }}&input_to={{ request.args.get('input_to') or '' }}&page={{ event_list.prev_num }}">Previous</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+        <a class="page-link" tabindex="-1" aria-disabled="true" href="javascript:void(0)">Previous</a>
+    </li>
+    {% endif %}
+    {% for page_num in event_list.iter_pages() %}
+    {% if page_num %}
+    {% if page_num != event_list.page %}
+    <li class="page-item">
+        <a class="page-link" href="?input_from={{ request.args.get('input_from') or '' }}&input_to={{ request.args.get('input_to') or '' }}&page={{ page_num }}">{{ page_num }}</a>
+    </li>
+    {% else %}
+    <li class="page-item active" aria-current="page">
+        <a class="page-link" href="javascript:void(0)">{{ page_num }}</a>
+    </li>
+    {% endif %}
+    {% else %}
+    <li class="disabled">
+        <a class="page-link" href="javascript:void(0)">...</a>
+    </li>
+    {% endif %}
+    {% endfor %}
+    {% if event_list.has_next %}
+    <li class="page-item">
+        <a class="page-link" href="?input_from={{ request.args.get('input_from') or '' }}&input_to={{ request.args.get('input_to') or '' }}&page={{ event_list.next_num }}">Next</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+        <a class="page-link" tabindex="-1" aria-disabled="true" href="javascript:void(0)">Next</a>
+    </li>
+    {% endif %}
+</ul>
+{% endblock %}
+{% block script %}
+{% endblock %}

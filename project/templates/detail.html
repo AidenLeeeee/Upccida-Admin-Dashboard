@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% block head %}
+<!-- CSS INIT -->
+<link rel="stylesheet" href="../static/css/detail.css">
+{% endblock %}
+
+{% block content %}
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-logo" href="{{ url_for('base.index') }}">
+            <img class="logo" src="../static/images/favicons.ico/favicon-96x96.png" alt="Logo" height="35" width="35">
+        </a>
+        <a class="navbar-brand" href="{{ url_for('base.index') }}">SOLOv6</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{{ url_for('base.index') }}">HOME</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('base.index') }}">Events</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('cars.cars') }}">Cars</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('users.users') }}">Users</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+{% if entry %}
+<!-- Main -->
+<div class="main">
+    <!-- Main_Header -->
+    <div class="header-box">
+        <div class="header-row">
+            <div class="header-col">
+                <h3 class="header-title fs-2">Event Dashboard</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main_Content -->
+    <div class="container main-content">
+        <div class="card detail-box mt-3">
+            <div class="detail-box-body">
+                <div class="detail-box-left">
+                    <h2 class="detail-box-title event-id card-info"><strong>Event ID :</strong> {{ entry.event.id }}</h2>
+                    <h4 class="detail-box-subtitle mb-2 text-muted event-date card-info"><strong>Date :</strong> {{ entry.event.created_on }}</h4>
+                    <h4 class="detail-box-text text-muted event-user card-info">
+                        <strong>User ID :</strong> {{ entry.event.user_id }}<br>
+                        <strong>Car ID :</strong> {{ entry.event.car_id }}
+                    </h4>
+                </div>
+                <div class="detail-box-right">
+                    <div class="inspected-on-box">
+                        <h4 class="inspected-on-box-title">Inspected On</h4>
+                        {% if entry.inspected_on %}
+                        <h5 class="inspected-on-box-text">{{ entry.inspected_on }}</h5>
+                        {% else %}
+                        <h5 class="inspected-on-box-text">-</h5>
+                        {% endif %}
+                    </div>
+                    <div class="inspector-box">
+                        <h4 class="inspector-box-title">Inspector</h4>
+                        {% if entry.inspector %}
+                        <h5 class="inspector-box-text">{{ entry.inspector }}</h5>
+                        {% else %}
+                        <h5 class="inspector-box-text">-</h5>
+                        {% endif %}
+                    </div>
+                    <div class="inspector-box-status">
+                        <h4 class="inspector-box-status-title">Status</h4>
+                        {% if entry.is_inspected %}
+                        <h5 class="inspector-box-status-text confirm-disabled">Confirmed! <i class="fa-solid fa-check check-icon"></i></h5>
+                        {% else %}
+                        <form action="{{ url_for('base.confirm', id=entry.event.id) }}" method="post">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <input class="inspector-input" type="hidden" name="inspector" value="{{ g.admin.admin_name }}">
+                            <button type="submit" class="btn mb-3 btn-success confirm-btn">
+                                Confirmed! <i class="fa-solid fa-check check-icon"></i>
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="info-box mt-3 mb-4">
+            <div class="info-image-box ps-4 pe-4">
+                <div class="row info-image-box-row mt-2">
+                    <div class="col-2 info-image-box-col ms-3">dent</div>
+                    <div class="col-2 info-image-box-col ms-2">scratch</div>
+                    <div class="col-2 info-image-box-col ms-1 me-5">spacing</div>
+                    <div class="col-2 info-image-box-col ms-3">is_damaged</div>
+                    <div class="col-2 info-image-box-col ms-5">inspect</div>
+                </div>
+                {% for path_inference in path_inference_list %}
+                <div class="content-box mt-2 mb-2">
+                    <div class="card mb-3 ms-2 me-2 mt-3 image-card">
+                        <img src="https://storage.googleapis.com/solov6-test-storage/path_inference_dent/{{ path_inference }}.jpeg" class="card-img-top" alt="{{ path_inference }}.jpeg">
+                    </div>
+                    <div class="card mb-3 ms-2 me-2 mt-3 image-card">
+                        <img src="https://storage.googleapis.com/solov6-test-storage/path_inference_scratch/{{ path_inference }}.jpeg" class="card-img-top" alt="{{ path_inference }}.jpeg">
+                    </div>
+                    <div class="card mb-3 ms-2 me-5 mt-3 image-card">
+                        <img src="https://storage.googleapis.com/solov6-test-storage/path_inference_spacing/{{ path_inference }}.jpeg" class="card-img-top" alt="{{ path_inference }}.jpeg">
+                    </div>
+                    <div class="is_damaged-box">
+                        {% if loop.index == 1 %}
+                        <h4>{{ entry.event.is_damaged_1 }}</h4>
+                        {% elif loop.index == 2 %}
+                        <h4>{{ entry.event.is_damaged_2 }}</h4>
+                        {% elif loop.index == 3 %}
+                        <h4>{{ entry.event.is_damaged_3 }}</h4>
+                        {% elif loop.index == 4 %}
+                        <h4>{{ entry.event.is_damaged_4 }}</h4>
+                        {% elif loop.index == 5 %}
+                        <h4>{{ entry.event.is_damaged_5 }}</h4>
+                        {% elif loop.index == 6 %}
+                        <h4>{{ entry.event.is_damaged_6 }}</h4>
+                        {% endif %}
+                    </div>
+                    {% if entry.is_inspected %}
+                    <div class="inspect-box">
+                        <form class="inspect-form" action="#" method="get">
+                            <button type="button" class="btn btn-primary inspect-btn" disabled>
+                                Inspect
+                            </button>
+                        </form>
+                    </div>
+                    {% else %}
+                    <div class="inspect-box">
+                        <form class="inspect-form" action="{{ url_for('base.inspect') }}" method="get">
+                            <input class="inspect-path-original" type="hidden" name="path_original" value="{{ path_inference }}.jpeg">
+                            <button type="submit" class="btn btn-primary mb-3 inspect-btn">
+                                Inspect
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<!-- Main -->
+<div class="main">
+    <!-- Main_Header -->
+    <div class="header-box">
+        <div class="header-row">
+            <div class="header-col">
+                <h3 class="header-title fs-2">Event Dashboard</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main_Content -->
+    <div class="container">
+        <div class="detail-box">
+            <h3 class="event-id message mt-5 mb-5">No damage detected.</h3>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

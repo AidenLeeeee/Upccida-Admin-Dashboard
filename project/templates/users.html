@@ -1,0 +1,164 @@
+<!-- CSS INIT -->
+<link rel="stylesheet" href="../static/css/users.css">
+
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-logo" href="{{ url_for('base.index') }}">
+            <img class="logo" src="../static/images/favicons.ico/favicon-96x96.png" alt="Logo" height="35" width="35">
+        </a>
+        <a class="navbar-brand" href="{{ url_for('base.index') }}">SOLOv6</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{{ url_for('base.index') }}">HOME</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('base.index') }}">Events</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('cars.cars') }}">Cars</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('users.users') }}">Users</a>
+                </li>
+            </ul>
+            <form id="search-form" class="d-flex" action="{{ url_for('users.users') }}" method="get">
+                <input id="needle search-needle" class="form-control me-2 search-form" type="text" name="needle" value="{{ needle or '' }}" placeholder="User ID..." aria-label="Search" autocomplete="off">
+                <input id="page" type="hidden" name="page" value=1>
+                <button id="btn-search" class="btn search-btn" type="submit">
+                    <i class="fa-solid fa-magnifying-glass fa-xl"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<!-- Main -->
+<div class="main">
+    <!-- Main_Register -->
+    <div class="register-box">
+        <div class="register-col">
+            <form class="register-form" action="{{ url_for('users.register') }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <input class="form-control register-input" type="text" name="user_name" placeholder="User name..." autocomplete="off">
+                <button type="submit" class="btn btn-primary mb-3 register-btn">
+                    Register
+                </button>
+            </form>
+        </div>
+        <div class="dropdown">
+            <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                Latest v1.0.0
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                <li><a class="dropdown-item" href="#">v1.0.0</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main_List -->
+    <div class="container list-box">
+        <div class="row list-title-box border-bottom">
+            <div class="col list-title my-3">
+                User ID
+            </div>
+            <div class="col list-title my-3">
+                User Name
+            </div>
+            <div class="col list-title my-3">
+                Registered On
+            </div>
+        </div>
+        {% if user_list %}
+            {% for user in user_list.items %}
+            <div class="card my-2">
+                <div class="card-body">
+                    <div class="row card-body-row">
+                        <div class="col list-col">
+                            {{ user.id }}
+                        </div>
+                        <div class="col list-col">
+                            {{ user.user_name }}
+                        </div>
+                        <div class="col list-col">
+                            {{ user.registered_on }}
+                            <div class="cancel-box">
+                                <form class="delete-form" action="{{ url_for('users.delete') }}" method="post">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <input class="delete-user-id-input" type="hidden" name="user_id" value="{{ user.id }}">
+                                    <button type="submit" class="btn btn-danger mb-3 cancel-btn">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="row">
+            <div class="col-12">
+                <h2>❌ No User Registered ❌</h2>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Pagination -->
+<ul class="pagination my-4 justify-content-center">
+    {% if user_list.has_prev %}
+    <li class="page-item">
+        <a class="page-link" href="?page={{ user_list.prev_num }}">Previous</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+        <a class="page-link" tabindex="-1" aria-disabled="true" href="javascript:void(0)">Previous</a>
+    </li>
+    {% endif %}
+    {% for page_num in user_list.iter_pages() %}
+    {% if page_num %}
+    {% if page_num != user_list.page %}
+    <li class="page-item">
+        <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+    </li>
+    {% else %}
+    <li class="page-item active" aria-current="page">
+        <a class="page-link" href="javascript:void(0)">{{ page_num }}</a>
+    </li>
+    {% endif %}
+    {% else %}
+    <li class="disabled">
+        <a class="page-link" href="javascript:void(0)">...</a>
+    </li>
+    {% endif %}
+    {% endfor %}
+    {% if user_list.has_next %}
+    <li class="page-item">
+        <a class="page-link" href="?page={{ user_list.next_num }}">Next</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+        <a class="page-link" tabindex="-1" aria-disabled="true" href="javascript:void(0)">Next</a>
+    </li>
+    {% endif %}
+</ul>
+{% endblock %}
+{% block script %}
+<script type="text/javascript">
+    const btn_search = document.getElementById('btn-search');
+    btn_search.addEventListener('click', function() {
+        document.getElementById('needle').value = document.getElementById('search-needle').value;
+        document.getElementById('page').value = 1;
+        document.getElementById('search-form').submit();
+    });
+</script>
+{% endblock %}
