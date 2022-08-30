@@ -1,4 +1,4 @@
-# SOLOv6 Admin Dashboard Overview
+# Upccida Admin Dashboard Overview
 
 <p align="center">
   <img width="319" alt="image" src="https://user-images.githubusercontent.com/85675215/173171356-b5e4092b-ebc7-47b4-bd47-1ac989ee4275.png">
